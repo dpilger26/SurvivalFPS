@@ -1,3 +1,7 @@
 SurvivalFPS/Library/
 
 SurvivalFPS/Temp/
+
+.vs/
+
+SurvivalFPS/obj/
