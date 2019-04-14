@@ -12,10 +12,28 @@ public class AIWaypointNetworkEditor : Editor // for Editor scripts
     // Desc	:	Called by Unity Editor when the Inspector needs repainting for an
     //			AIWaypointNetwork Component
     // --------------------------------------------------------------------------------
-    //public override void OnInspectorGUI()
-    //{
+    public override void OnInspectorGUI()
+    {
+        // draws what would have been automatically drawn by unity if this method wasn't defined
+        DrawDefaultInspector();
 
-    //}
+        // gets access to the selected AIWaypointNetwork
+        AIWaypointNetwork network = (AIWaypointNetwork)target; // c# uses c-style casting
+
+        // display the enumeration
+        var displayMode = (PathDisplayMode)EditorGUILayout.EnumPopup("Display Mode", network.GetDisplayMode());
+        network.SetDisplayMode(displayMode);
+
+        if (network.GetDisplayMode() == PathDisplayMode.Paths) // only display these options when in paths mode
+        {
+            //int numWaypoints = network.GetWaypoints().Count;
+            int numWaypoints = network.GetWaypoints().Count;
+            var startIdx = EditorGUILayout.IntSlider("Waypoint Start", network.GetUiStartIndex(), 0, numWaypoints - 1);
+            network.SetUiStartIndex(startIdx);
+            var endIdx = EditorGUILayout.IntSlider("Waypoint End", network.GetUiEndIndex(), 0, numWaypoints - 1);
+            network.SetUiEndIndex(endIdx);
+        }
+    }
 
     // --------------------------------------------------------------------------------
     // Name	:	OnSceneGUI
@@ -67,15 +85,21 @@ public class AIWaypointNetworkEditor : Editor // for Editor scripts
             int startIdx = network.GetUiStartIndex();
             int endIdx = network.GetUiEndIndex();
 
-            Vector3 fromPosition = waypoints[startIdx].position;
-            Vector3 toPosition = waypoints[endIdx].position;
+            var fromWaypoint = waypoints[startIdx];
+            var toWaypoint = waypoints[endIdx];
 
-            // query the navmesh to calculate the path
-            if (NavMesh.CalculatePath(fromPosition, toPosition, NavMesh.AllAreas, navMeshPath))
+            if (fromWaypoint != null && toWaypoint != null)
             {
-                // draw the array of points in the calculated path
-                Handles.color = Color.yellow;
-                Handles.DrawPolyLine(navMeshPath.corners);
+                Vector3 fromPosition = fromWaypoint.position;
+                Vector3 toPosition = toWaypoint.position;
+
+                // query the navmesh to calculate the path
+                if (NavMesh.CalculatePath(fromPosition, toPosition, NavMesh.AllAreas, navMeshPath))
+                {
+                    // draw the array of points in the calculated path
+                    Handles.color = Color.yellow;
+                    Handles.DrawPolyLine(navMeshPath.corners);
+                }
             }
         }
     }
