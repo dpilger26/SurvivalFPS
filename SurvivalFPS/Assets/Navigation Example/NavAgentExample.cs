@@ -10,6 +10,8 @@ public class NavAgentExample : MonoBehaviour
     // configuration parameters
     [SerializeField] AIWaypointNetwork waypointNetwork;
     [SerializeField] int currentWaypointIdx = 0;
+    [SerializeField] float jumpDuration = 1.0f;
+    [SerializeField] AnimationCurve jumpCurve = new AnimationCurve();
 
     // cached references
     private NavMeshAgent myNavMeshAgent;
@@ -31,6 +33,11 @@ public class NavAgentExample : MonoBehaviour
 
     private void Update()
     {
+        if (myNavMeshAgent.isOnOffMeshLink)
+        {
+            StartCoroutine(Jump(jumpDuration));
+        }
+
         if ((!myNavMeshAgent.hasPath && !myNavMeshAgent.pathPending) ||
             myNavMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
         {
@@ -40,6 +47,25 @@ public class NavAgentExample : MonoBehaviour
         {
             SetNextDestination(false);
         }
+    }
+
+    IEnumerator Jump(float duration)
+    {
+        OffMeshLinkData data = myNavMeshAgent.currentOffMeshLinkData;
+        Vector3 startPos = transform.position;
+        Vector3 endPos = data.endPos + (myNavMeshAgent.baseOffset * Vector3.up); // takes into account the base offset
+
+        float time = 0.0f;
+
+        while(time < duration)
+        {
+            float t = time / duration;
+            myNavMeshAgent.transform.position = Vector3.Lerp(startPos, endPos, t) + jumpCurve.Evaluate(t) * Vector3.up;
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        myNavMeshAgent.CompleteOffMeshLink(); // give control of navigation back to unity
     }
 
     private void SetNextDestination(bool incramentIndex)
