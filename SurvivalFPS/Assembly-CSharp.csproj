@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\DeadEarth\Scripts\AIWaypointNetwork.cs" />
+    <Compile Include="Assets\DeadEarth\Scripts\Door.cs" />
     <Compile Include="Assets\Navigation Example\NavAgentExample.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/pilgeda/Documents/GitHub/Udemy/SurvivalFPS/SurvivalFPS/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
